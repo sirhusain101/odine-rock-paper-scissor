@@ -2,6 +2,19 @@
 let userScore = 0;
 let computerScore = 0;
 
+// Buttons selected by id
+const rockBtn = document.querySelector("#rock");
+const paperBtn = document.querySelector("#paper");
+const scissorBtn = document.querySelector("#scissor");
+
+// Create replay button and start it hidden
+const replayBtn = document.querySelector("#replay");
+replayBtn.style.display = "none";
+
+// Selects score and message content
+let score = document.querySelector("#score");
+let message = document.querySelector("#message");
+
 // Function for computer choice
 function getComputerChoice() {
   const computerChoice = Math.floor(Math.random() * (3 - 1 + 1) + 1);
@@ -14,78 +27,69 @@ function getComputerChoice() {
   }
 }
 
-// Function for user choice
-function getUserChoice() {
-  let userChoice = prompt("Rock, Paper or Scissor?").toLowerCase();
-  while (
-    userChoice !== "rock" &&
-    userChoice !== "paper" &&
-    userChoice !== "scissor"
-  ) {
-    userChoice = prompt(
-      "Enter a valid choice: Rock, Paper or Scissor?"
-    ).toLowerCase();
-  }
-  return userChoice;
-}
-
 // Function for game logic
-function playRound(userScore, computerScore) {
+function playRound(userSelection) {
   const computerSelection = getComputerChoice();
-  const userSelection = getUserChoice();
 
   if (
     (computerSelection === "rock" && userSelection === "scissor") ||
     (computerSelection === "scissor" && userSelection === "paper") ||
     (computerSelection === "paper" && userSelection === "rock")
   ) {
-    console.log(`You Lose! ${computerSelection} beats ${userSelection}.`);
+    message.innerText = `You lose this round! ${computerSelection} beats ${userSelection}.`;
     computerScore += 1;
   } else if (
     (userSelection === "rock" && computerSelection === "scissor") ||
     (userSelection === "scissor" && computerSelection === "paper") ||
     (userSelection === "paper" && computerSelection === "rock")
   ) {
-    console.log(`You Win! ${userSelection} beats ${computerSelection}.`);
+    message.innerText = `You win this round! ${userSelection} beats ${computerSelection}.`;
     userScore += 1;
   } else {
-    console.log(`It's a Tie! ${userSelection} cancels ${computerSelection}.`);
+    message.innerText = `This round is a tie! ${userSelection} cancels ${computerSelection}.`;
   }
-  return { userScore, computerScore };
+  // display running score
+  score.innerText = `User Score: ${userScore} | Computer Score: ${computerScore}`;
+
+  if (userScore === 5) {
+    rockBtn.disabled = true;
+    paperBtn.disabled = true;
+    scissorBtn.disabled = true;
+    message.innerText = `Final Result: You Won! You beat Computer ${userScore} to ${computerScore}.`;
+    replayBtn.style.display = "block";
+
+    userScore = 0;
+    computerScore = 0;
+  } else if (computerScore === 5) {
+    rockBtn.disabled = true;
+    paperBtn.disabled = true;
+    scissorBtn.disabled = true;
+    message.innerText = `Final Result: You Lost! Computer beat You ${computerScore} to ${userScore}.`;
+    replayBtn.style.display = "block";
+
+    userScore = 0;
+    computerScore = 0;
+  }
+
+  replayBtn.addEventListener("click", () => {
+    rockBtn.disabled = false;
+    paperBtn.disabled = false;
+    scissorBtn.disabled = false;
+    score.innerText = "";
+    message.innerText = "";
+    replayBtn.style.display = "none";
+  });
 }
 
-// Function for total rounds prompt
-function getTotalRounds() {
-  let userInputRound = Number(prompt("How many rounds do you wanna play:"));
-  while (isNaN(userInputRound) || userInputRound < 1) {
-    userInputRound = Number(prompt("Enter a valid number:"));
-  }
-  return userInputRound;
-}
+// Event listeners
+rockBtn.addEventListener("click", () => {
+  playRound("rock");
+});
 
-// Function for game play rounds
-function playGame() {
-  const totalRounds = getTotalRounds();
-  let round = 1;
+paperBtn.addEventListener("click", () => {
+  playRound("paper");
+});
 
-  while (round <= totalRounds) {
-    ({ userScore, computerScore } = playRound(userScore, computerScore));
-    round++;
-  }
-  console.log(`Score - User: ${userScore} | Computer: ${computerScore}`);
-}
-
-// Function for who wins
-function whoWon() {
-  if (userScore > computerScore) {
-    alert("You Won! You beat Computer");
-  } else if (userScore < computerScore) {
-    alert("You Lost! Computer beat You.");
-  } else {
-    alert("Tied! Nobody Won or Lost.");
-  }
-}
-
-// Run game
-playGame();
-whoWon();
+scissorBtn.addEventListener("click", () => {
+  playRound("scissor");
+});
